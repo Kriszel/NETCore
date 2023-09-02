@@ -3,13 +3,13 @@ using SampleWebApiAspNetCore.Entities;
 
 namespace SampleWebApiAspNetCore.Repositories
 {
-    public class FoodDbContext : DbContext
+    public class AnimalDbContext : DbContext
     {
-        public FoodDbContext(DbContextOptions<FoodDbContext> options)
+        public AnimalDbContext(DbContextOptions<AnimalDbContext> options)
             : base(options)
         {
         }
 
-        public DbSet<FoodEntity> FoodItems { get; set; } = null!;
+        public DbSet<AnimalEntity> AnimalItems { get; set; } = null!;
     }
 }

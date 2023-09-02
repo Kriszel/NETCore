@@ -76,7 +76,7 @@ namespace SampleWebApiAspNetCore.Services
             return links;
         }
 
-        public object ExpandSingleFoodItem(object resource, int identifier, ApiVersion version)
+        public object ExpandSingleItem(object resource, int identifier, ApiVersion version)
         {
             var resourceToReturn = resource.ToDynamic() as IDictionary<string, object>;
 

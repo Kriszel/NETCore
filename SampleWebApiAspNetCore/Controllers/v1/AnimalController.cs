@@ -14,28 +14,28 @@ namespace SampleWebApiAspNetCore.Controllers.v1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class FoodsController : ControllerBase
+    public class AnimalController : ControllerBase
     {
-        private readonly IFoodRepository _foodRepository;
+        private readonly IAnimalRepository _animalRepository;
         private readonly IMapper _mapper;
-        private readonly ILinkService<FoodsController> _linkService;
+        private readonly ILinkService<AnimalController> _linkService;
 
-        public FoodsController(
-            IFoodRepository foodRepository,
+        public AnimalController(
+            IAnimalRepository AnimalRepository,
             IMapper mapper,
-            ILinkService<FoodsController> linkService)
+            ILinkService<AnimalController> linkService)
         {
-            _foodRepository = foodRepository;
+            _animalRepository = AnimalRepository;
             _mapper = mapper;
             _linkService = linkService;
         }
 
-        [HttpGet(Name = nameof(GetAllFoods))]
-        public ActionResult GetAllFoods(ApiVersion version, [FromQuery] QueryParameters queryParameters)
+        [HttpGet(Name = nameof(GetAllAnimals))]
+        public ActionResult GetAllAnimals(ApiVersion version, [FromQuery] QueryParameters queryParameters)
         {
-            List<FoodEntity> foodItems = _foodRepository.GetAll(queryParameters).ToList();
+            List<AnimalEntity> AnimalItems = _animalRepository.GetAll(queryParameters).ToList();
 
-            var allItemCount = _foodRepository.Count();
+            var allItemCount = _animalRepository.Count();
 
             var paginationMetadata = new
             {
@@ -48,7 +48,7 @@ namespace SampleWebApiAspNetCore.Controllers.v1
             Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(paginationMetadata));
 
             var links = _linkService.CreateLinksForCollection(queryParameters, allItemCount, version);
-            var toReturn = foodItems.Select(x => _linkService.ExpandSingleItem(x, x.Id, version));
+            var toReturn = AnimalItems.Select(x => _linkService.ExpandSingleItem(x, x.Id, version));
 
             return Ok(new
             {
@@ -58,141 +58,141 @@ namespace SampleWebApiAspNetCore.Controllers.v1
         }
 
         [HttpGet]
-        [Route("{id:int}", Name = nameof(GetSingleFood))]
-        public ActionResult GetSingleFood(ApiVersion version, int id)
+        [Route("{id:int}", Name = nameof(GetSingleAnimal))]
+        public ActionResult GetSingleAnimal(ApiVersion version, int id)
         {
-            FoodEntity foodItem = _foodRepository.GetSingle(id);
+            AnimalEntity AnimalItem = _animalRepository.GetSingle(id);
 
-            if (foodItem == null)
+            if (AnimalItem == null)
             {
                 return NotFound();
             }
 
-            FoodDto item = _mapper.Map<FoodDto>(foodItem);
+            AnimalDto item = _mapper.Map<AnimalDto>(AnimalItem);
 
             return Ok(_linkService.ExpandSingleItem(item, item.Id, version));
         }
 
-        [HttpPost(Name = nameof(AddFood))]
-        public ActionResult<FoodDto> AddFood(ApiVersion version, [FromBody] FoodCreateDto foodCreateDto)
+        [HttpPost(Name = nameof(AddAnimal))]
+        public ActionResult<AnimalDto> AddAnimal(ApiVersion version, [FromBody] AnimalCreateDto animalCreateDto)
         {
-            if (foodCreateDto == null)
+            if (animalCreateDto == null)
             {
                 return BadRequest();
             }
 
-            FoodEntity toAdd = _mapper.Map<FoodEntity>(foodCreateDto);
+            AnimalEntity toAdd = _mapper.Map<AnimalEntity>(animalCreateDto);
 
-            _foodRepository.Add(toAdd);
+            _animalRepository.Add(toAdd);
 
-            if (!_foodRepository.Save())
+            if (!_animalRepository.Save())
             {
-                throw new Exception("Creating a fooditem failed on save.");
+                throw new Exception("Creating a Animalitem failed on save.");
             }
 
-            FoodEntity newFoodItem = _foodRepository.GetSingle(toAdd.Id);
-            FoodDto foodDto = _mapper.Map<FoodDto>(newFoodItem);
+            AnimalEntity newAnimalItem = _animalRepository.GetSingle(toAdd.Id);
+            AnimalDto AnimalDto = _mapper.Map<AnimalDto>(newAnimalItem);
 
-            return CreatedAtRoute(nameof(GetSingleFood),
-                new { version = version.ToString(), id = newFoodItem.Id },
-                _linkService.ExpandSingleItem(foodDto, foodDto.Id, version));
+            return CreatedAtRoute(nameof(GetSingleAnimal),
+                new { version = version.ToString(), id = newAnimalItem.Id },
+                _linkService.ExpandSingleItem(AnimalDto, AnimalDto.Id, version));
         }
 
-        [HttpPatch("{id:int}", Name = nameof(PartiallyUpdateFood))]
-        public ActionResult<FoodDto> PartiallyUpdateFood(ApiVersion version, int id, [FromBody] JsonPatchDocument<FoodUpdateDto> patchDoc)
+        [HttpPatch("{id:int}", Name = nameof(PartiallyUpdateAnimal))]
+        public ActionResult<AnimalDto> PartiallyUpdateAnimal(ApiVersion version, int id, [FromBody] JsonPatchDocument<AnimalUpdateDto> patchDoc)
         {
             if (patchDoc == null)
             {
                 return BadRequest();
             }
 
-            FoodEntity existingEntity = _foodRepository.GetSingle(id);
+            AnimalEntity existingEntity = _animalRepository.GetSingle(id);
 
             if (existingEntity == null)
             {
                 return NotFound();
             }
 
-            FoodUpdateDto foodUpdateDto = _mapper.Map<FoodUpdateDto>(existingEntity);
-            patchDoc.ApplyTo(foodUpdateDto);
+            AnimalUpdateDto animalUpdateDto = _mapper.Map<AnimalUpdateDto>(existingEntity);
+            patchDoc.ApplyTo(animalUpdateDto);
 
-            TryValidateModel(foodUpdateDto);
+            TryValidateModel(animalUpdateDto);
 
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            _mapper.Map(foodUpdateDto, existingEntity);
-            FoodEntity updated = _foodRepository.Update(id, existingEntity);
+            _mapper.Map(animalUpdateDto, existingEntity);
+            AnimalEntity updated = _animalRepository.Update(id, existingEntity);
 
-            if (!_foodRepository.Save())
+            if (!_animalRepository.Save())
             {
-                throw new Exception("Updating a fooditem failed on save.");
+                throw new Exception("Updating a Animalitem failed on save.");
             }
 
-            FoodDto foodDto = _mapper.Map<FoodDto>(updated);
+            AnimalDto animalDto = _mapper.Map<AnimalDto>(updated);
 
-            return Ok(_linkService.ExpandSingleItem(foodDto, foodDto.Id, version));
+            return Ok(_linkService.ExpandSingleItem(animalDto, animalDto.Id, version));
         }
 
         [HttpDelete]
-        [Route("{id:int}", Name = nameof(RemoveFood))]
-        public ActionResult RemoveFood(int id)
+        [Route("{id:int}", Name = nameof(RemoveAnimal))]
+        public ActionResult RemoveAnimal(int id)
         {
-            FoodEntity foodItem = _foodRepository.GetSingle(id);
+            AnimalEntity animalItem = _animalRepository.GetSingle(id);
 
-            if (foodItem == null)
+            if (animalItem == null)
             {
                 return NotFound();
             }
 
-            _foodRepository.Delete(id);
+            _animalRepository.Delete(id);
 
-            if (!_foodRepository.Save())
+            if (!_animalRepository.Save())
             {
-                throw new Exception("Deleting a fooditem failed on save.");
+                throw new Exception("Deleting a Animalitem failed on save.");
             }
 
             return NoContent();
         }
 
         [HttpPut]
-        [Route("{id:int}", Name = nameof(UpdateFood))]
-        public ActionResult<FoodDto> UpdateFood(ApiVersion version, int id, [FromBody] FoodUpdateDto foodUpdateDto)
+        [Route("{id:int}", Name = nameof(UpdateAnimal))]
+        public ActionResult<AnimalDto> UpdateAnimal(ApiVersion version, int id, [FromBody] AnimalUpdateDto AnimalUpdateDto)
         {
-            if (foodUpdateDto == null)
+            if (AnimalUpdateDto == null)
             {
                 return BadRequest();
             }
 
-            var existingFoodItem = _foodRepository.GetSingle(id);
+            var existingAnimalItem = _animalRepository.GetSingle(id);
 
-            if (existingFoodItem == null)
+            if (existingAnimalItem == null)
             {
                 return NotFound();
             }
 
-            _mapper.Map(foodUpdateDto, existingFoodItem);
+            _mapper.Map(AnimalUpdateDto, existingAnimalItem);
 
-            _foodRepository.Update(id, existingFoodItem);
+            _animalRepository.Update(id, existingAnimalItem);
 
-            if (!_foodRepository.Save())
+            if (!_animalRepository.Save())
             {
-                throw new Exception("Updating a fooditem failed on save.");
+                throw new Exception("Updating a Animalitem failed on save.");
             }
 
-            FoodDto foodDto = _mapper.Map<FoodDto>(existingFoodItem);
+            AnimalDto AnimalDto = _mapper.Map<AnimalDto>(existingAnimalItem);
 
-            return Ok(_linkService.ExpandSingleItem(foodDto, foodDto.Id, version));
+            return Ok(_linkService.ExpandSingleItem(AnimalDto, AnimalDto.Id, version));
         }
 
         [HttpGet("GetRandomMeal", Name = nameof(GetRandomMeal))]
         public ActionResult GetRandomMeal()
         {
-            ICollection<FoodEntity> foodItems = _foodRepository.GetRandomMeal();
+            ICollection<AnimalEntity> AnimalItems = _animalRepository.GetRandomMeal();
 
-            IEnumerable<FoodDto> dtos = foodItems.Select(x => _mapper.Map<FoodDto>(x));
+            IEnumerable<AnimalDto> dtos = AnimalItems.Select(x => _mapper.Map<AnimalDto>(x));
 
             var links = new List<LinkDto>();
 

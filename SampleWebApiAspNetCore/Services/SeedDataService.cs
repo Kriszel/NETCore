@@ -5,14 +5,17 @@ namespace SampleWebApiAspNetCore.Services
 {
     public class SeedDataService : ISeedDataService
     {
-        public void Initialize(FoodDbContext context)
+        public void Initialize(AnimalDbContext animalContext)
         {
-            context.FoodItems.Add(new FoodEntity() { Calories = 1000, Type = "Starter", Name = "Lasagne", Created = DateTime.Now });
-            context.FoodItems.Add(new FoodEntity() { Calories = 1100, Type = "Main", Name = "Hamburger", Created = DateTime.Now });
-            context.FoodItems.Add(new FoodEntity() { Calories = 1200, Type = "Dessert", Name = "Spaghetti", Created = DateTime.Now });
-            context.FoodItems.Add(new FoodEntity() { Calories = 1300, Type = "Starter", Name = "Pizza", Created = DateTime.Now });
 
-            context.SaveChanges();
+            animalContext.AnimalItems.Add(new AnimalEntity() { Calories = 1000, Type = "Mammal", Name = "Cat", Created = DateTime.Now });
+            animalContext.AnimalItems.Add(new AnimalEntity() { Calories = 999, Type = "Fish", Name = "Clownfish", Created = DateTime.Now });
+            animalContext.AnimalItems.Add(new AnimalEntity() { Calories = 998, Type = "Amphibian", Name = "Platypus", Created = DateTime.Now });
+            animalContext.AnimalItems.Add(new AnimalEntity() { Calories = 997, Type = "Reptile", Name = "Chameleon", Created = DateTime.Now });
+
+            animalContext.SaveChanges();
+
+
         }
     }
 }

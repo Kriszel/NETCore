@@ -5,40 +5,40 @@ using System.Linq.Dynamic.Core;
 
 namespace SampleWebApiAspNetCore.Repositories
 {
-    public class FoodSqlRepository : IFoodRepository
+    public class AnimalSqlRepository : IAnimalRepository
     {
-        private readonly FoodDbContext _foodDbContext;
+        private readonly AnimalDbContext _animalDbContext;
 
-        public FoodSqlRepository(FoodDbContext foodDbContext)
+        public AnimalSqlRepository(AnimalDbContext AnimalDbContext)
         {
-            _foodDbContext = foodDbContext;
+            _animalDbContext = AnimalDbContext;
         }
 
-        public FoodEntity GetSingle(int id)
+        public AnimalEntity GetSingle(int id)
         {
-            return _foodDbContext.FoodItems.FirstOrDefault(x => x.Id == id);
+            return _animalDbContext.AnimalItems.FirstOrDefault(x => x.Id == id);
         }
 
-        public void Add(FoodEntity item)
+        public void Add(AnimalEntity item)
         {
-            _foodDbContext.FoodItems.Add(item);
+            _animalDbContext.AnimalItems.Add(item);
         }
 
         public void Delete(int id)
         {
-            FoodEntity foodItem = GetSingle(id);
-            _foodDbContext.FoodItems.Remove(foodItem);
+            AnimalEntity foodItem = GetSingle(id);
+            _animalDbContext.AnimalItems.Remove(foodItem);
         }
 
-        public FoodEntity Update(int id, FoodEntity item)
+        public AnimalEntity Update(int id, AnimalEntity item)
         {
-            _foodDbContext.FoodItems.Update(item);
+            _animalDbContext.AnimalItems.Update(item);
             return item;
         }
 
-        public IQueryable<FoodEntity> GetAll(QueryParameters queryParameters)
+        public IQueryable<AnimalEntity> GetAll(QueryParameters queryParameters)
         {
-            IQueryable<FoodEntity> _allItems = _foodDbContext.FoodItems.OrderBy(queryParameters.OrderBy,
+            IQueryable<AnimalEntity> _allItems = _animalDbContext.AnimalItems.OrderBy(queryParameters.OrderBy,
               queryParameters.IsDescending());
 
             if (queryParameters.HasQuery())
@@ -55,17 +55,17 @@ namespace SampleWebApiAspNetCore.Repositories
 
         public int Count()
         {
-            return _foodDbContext.FoodItems.Count();
+            return _animalDbContext.AnimalItems.Count();
         }
 
         public bool Save()
         {
-            return (_foodDbContext.SaveChanges() >= 0);
+            return (_animalDbContext.SaveChanges() >= 0);
         }
 
-        public ICollection<FoodEntity> GetRandomMeal()
+        public ICollection<AnimalEntity> GetRandomMeal()
         {
-            List<FoodEntity> toReturn = new List<FoodEntity>();
+            List<AnimalEntity> toReturn = new List<AnimalEntity>();
 
             toReturn.Add(GetRandomItem("Starter"));
             toReturn.Add(GetRandomItem("Main"));
@@ -74,9 +74,9 @@ namespace SampleWebApiAspNetCore.Repositories
             return toReturn;
         }
 
-        private FoodEntity GetRandomItem(string type)
+        private AnimalEntity GetRandomItem(string type)
         {
-            return _foodDbContext.FoodItems
+            return _animalDbContext.AnimalItems
                 .Where(x => x.Type == type)
                 .OrderBy(o => Guid.NewGuid())
                 .FirstOrDefault();
